@@ -5,7 +5,7 @@ export const runtime = "edge";
 
 export async function POST(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
-  const { email, password } = await request.json();
+  const { email, password } = await request.json() as any;
 
   const validEmails = (env.BAND_EMAILS as string).split(",").map((e: string) => e.trim());
   const validPassword = env.BAND_PASSWORD as string;
