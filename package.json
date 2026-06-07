@@ -49,5 +49,11 @@
     "tailwindcss": "^4",
     "typescript": "^5.7.4",
     "wrangler": "^4.98.0"
+  },
+  "overrides": {
+    "@react-jvectormap/core": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
   }
 }
