@@ -2,8 +2,102 @@
 
 @plugin 'tailwindcss-animate';
 
+/* 1. Define Core Structural CSS Variables FIRST */
+:root {
+  --background: hsl(0, 20%, 97%);
+  --foreground: hsl(0, 0%, 3.9%);
+  --card: hsl(0, 20%, 97%);
+  --card-foreground: hsl(0, 0%, 3.9%);
+  --popover: hsl(0, 20%, 97%);
+  --popover-foreground: hsl(0, 0%, 3.9%);
+  --primary: hsl(0, 52%, 38%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(0, 15%, 92%);
+  --secondary-foreground: hsl(0, 20%, 15%);
+  --muted: hsl(0, 10%, 94%);
+  --muted-foreground: hsl(0, 8%, 45%);
+  --accent: hsl(0, 20%, 90%);
+  --accent-foreground: hsl(0, 30%, 20%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 10%, 88%);
+  --input: hsl(0, 10%, 85%);
+  --ring: hsl(0, 52%, 38%);
+
+  /* Brand Definition (Calculated light tint for brand-50 matches your HSL profile) */
+  --brand: hsl(0, 52%, 38%);
+  --brand-50: hsl(0, 100%, 97%);
+  --brand-100: hsl(0, 93%, 93%);
+  --brand-400: hsl(0, 52%, 48%);
+  --brand-500: hsl(0, 52%, 38%);
+  --brand-foreground: hsl(0, 0%, 98%);
+  --brand-muted: hsl(0, 30%, 58%);
+
+  --chart-1: hsl(0, 52%, 45%);
+  --chart-2: hsl(173, 58%, 39%);
+  --chart-3: hsl(197, 37%, 24%);
+  --chart-4: hsl(43, 74%, 66%);
+  --chart-5: hsl(27, 87%, 67%);
+  --radius: 0.5rem;
+  --sidebar-background: hsl(0, 10%, 96%);
+  --sidebar-foreground: hsl(0, 10%, 30%);
+  --sidebar-primary: hsl(0, 52%, 38%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(0, 10%, 91%);
+  --sidebar-accent-foreground: hsl(0, 15%, 25%);
+  --sidebar-border: hsl(0, 10%, 88%);
+  --sidebar-ring: hsl(0, 52%, 38%);
+}
+
+.dark {
+  --background: hsl(0, 8%, 8%);
+  --foreground: hsl(0, 0%, 93%);
+  --card: hsl(0, 8%, 10%);
+  --card-foreground: hsl(0, 0%, 93%);
+  --popover: hsl(0, 8%, 10%);
+  --popover-foreground: hsl(0, 0%, 93%);
+  --primary: hsl(0, 52%, 52%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(0, 6%, 15%);
+  --secondary-foreground: hsl(0, 0%, 90%);
+  --muted: hsl(0, 6%, 13%);
+  --muted-foreground: hsl(0, 5%, 60%);
+  --accent: hsl(0, 6%, 16%);
+  --accent-foreground: hsl(0, 0%, 90%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 6%, 16%);
+  --input: hsl(0, 6%, 16%);
+  --ring: hsl(0, 52%, 52%);
+
+  /* Dark Mode Brand Adaptations */
+  --brand: hsl(0, 52%, 52%);
+  --brand-50: hsl(0, 45%, 12%);
+  --brand-100: hsl(0, 50%, 18%);
+  --brand-400: hsl(0, 52%, 52%);
+  --brand-500: hsl(0, 52%, 45%);
+  --brand-foreground: hsl(0, 0%, 98%);
+  --brand-muted: hsl(0, 30%, 35%);
+
+  --chart-1: hsl(0, 52%, 55%);
+  --chart-2: hsl(160, 60%, 45%);
+  --chart-3: hsl(30, 80%, 55%);
+  --chart-4: hsl(280, 65%, 60%);
+  --chart-5: hsl(340, 75%, 55%);
+  --radius: 0.5rem;
+  --sidebar-background: hsl(0, 8%, 7%);
+  --sidebar-foreground: hsl(0, 0%, 78%);
+  --sidebar-primary: hsl(0, 52%, 52%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(0, 6%, 13%);
+  --sidebar-accent-foreground: hsl(0, 0%, 88%);
+  --sidebar-border: hsl(0, 6%, 14%);
+  --sidebar-ring: hsl(0, 52%, 52%);
+}
+
 @custom-variant dark (&:is(.dark *));
 
+/* 2. Map Extended Tailwind configuration safely */
 @theme {
   /* ── Brand Fonts ── */
   --font-sans:
@@ -66,9 +160,16 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Brand Core Configuration */
   --color-brand: var(--brand);
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-muted: var(--brand-muted);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -203,85 +304,6 @@
   --z-index-9999: 9999;
   --z-index-99999: 99999;
   --z-index-999999: 999999;
-}
-
-/* ── Brand CSS Variables ── */
-:root {
-  --background: hsl(0, 20%, 97%);
-  --foreground: hsl(0, 0%, 3.9%);
-  --card: hsl(0, 20%, 97%);
-  --card-foreground: hsl(0, 0%, 3.9%);
-  --popover: hsl(0, 20%, 97%);
-  --popover-foreground: hsl(0, 0%, 3.9%);
-  --primary: hsl(0, 52%, 38%);
-  --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(0, 15%, 92%);
-  --secondary-foreground: hsl(0, 20%, 15%);
-  --muted: hsl(0, 10%, 94%);
-  --muted-foreground: hsl(0, 8%, 45%);
-  --accent: hsl(0, 20%, 90%);
-  --accent-foreground: hsl(0, 30%, 20%);
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --border: hsl(0, 10%, 88%);
-  --input: hsl(0, 10%, 85%);
-  --ring: hsl(0, 52%, 38%);
-  --brand: hsl(0, 52%, 38%);
-  --brand-foreground: hsl(0, 0%, 98%);
-  --brand-muted: hsl(0, 30%, 58%);
-  --chart-1: hsl(0, 52%, 45%);
-  --chart-2: hsl(173, 58%, 39%);
-  --chart-3: hsl(197, 37%, 24%);
-  --chart-4: hsl(43, 74%, 66%);
-  --chart-5: hsl(27, 87%, 67%);
-  --radius: 0.5rem;
-  --sidebar-background: hsl(0, 10%, 96%);
-  --sidebar-foreground: hsl(0, 10%, 30%);
-  --sidebar-primary: hsl(0, 52%, 38%);
-  --sidebar-primary-foreground: hsl(0, 0%, 98%);
-  --sidebar-accent: hsl(0, 10%, 91%);
-  --sidebar-accent-foreground: hsl(0, 15%, 25%);
-  --sidebar-border: hsl(0, 10%, 88%);
-  --sidebar-ring: hsl(0, 52%, 38%);
-}
-
-.dark {
-  --background: hsl(0, 8%, 8%);
-  --foreground: hsl(0, 0%, 93%);
-  --card: hsl(0, 8%, 10%);
-  --card-foreground: hsl(0, 0%, 93%);
-  --popover: hsl(0, 8%, 10%);
-  --popover-foreground: hsl(0, 0%, 93%);
-  --primary: hsl(0, 52%, 52%);
-  --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(0, 6%, 15%);
-  --secondary-foreground: hsl(0, 0%, 90%);
-  --muted: hsl(0, 6%, 13%);
-  --muted-foreground: hsl(0, 5%, 60%);
-  --accent: hsl(0, 6%, 16%);
-  --accent-foreground: hsl(0, 0%, 90%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --border: hsl(0, 6%, 16%);
-  --input: hsl(0, 6%, 16%);
-  --ring: hsl(0, 52%, 52%);
-  --brand: hsl(0, 52%, 52%);
-  --brand-foreground: hsl(0, 0%, 98%);
-  --brand-muted: hsl(0, 30%, 35%);
-  --chart-1: hsl(0, 52%, 55%);
-  --chart-2: hsl(160, 60%, 45%);
-  --chart-3: hsl(30, 80%, 55%);
-  --chart-4: hsl(280, 65%, 60%);
-  --chart-5: hsl(340, 75%, 55%);
-  --radius: 0.5rem;
-  --sidebar-background: hsl(0, 8%, 7%);
-  --sidebar-foreground: hsl(0, 0%, 78%);
-  --sidebar-primary: hsl(0, 52%, 52%);
-  --sidebar-primary-foreground: hsl(0, 0%, 98%);
-  --sidebar-accent: hsl(0, 6%, 13%);
-  --sidebar-accent-foreground: hsl(0, 0%, 88%);
-  --sidebar-border: hsl(0, 6%, 14%);
-  --sidebar-ring: hsl(0, 52%, 52%);
 }
 
 /* ── Base Layer ── */
