@@ -15,6 +15,19 @@
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "strawberry-sweets",
+			"database_id": "d773a275-44da-4c31-b288-ff84ad645030"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "BUCKET",
+			"bucket_name": "strawberry-sweets"
+		}
+	],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".open-next/assets"
