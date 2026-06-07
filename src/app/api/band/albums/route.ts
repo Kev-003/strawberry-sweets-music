@@ -23,7 +23,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
-  const body = await request.json();
+  const body = await request.json() as any;
 
   const {
     title, release_date, cover_art, banner_webp, banner_gif,
