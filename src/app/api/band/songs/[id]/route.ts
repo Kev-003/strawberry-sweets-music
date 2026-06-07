@@ -1,17 +1,33 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const runtime = "edge";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function GET(
+  request: NextRequest, 
+  context: RouteContext
+) {
+  const { id } = await context.params;
   const { env } = await getCloudflareContext({ async: true });
+  
   const song = await env.DB.prepare(`SELECT * FROM songs WHERE id = ?`)
-    .bind(params.id).first();
+    .bind(id).first();
   if (!song) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  
   return NextResponse.json(song);
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest, 
+  context: RouteContext
+) {
+  const { id } = await context.params;
   const { env } = await getCloudflareContext({ async: true });
   const body = await request.json();
 
@@ -35,17 +51,23 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       title_webp ?? null, title_effect_webp ?? null, track_number ?? null, spotify_id ?? null,
       release_date ?? null, description ?? null, presave_link ?? null,
       links ? JSON.stringify(links) : null, video_url ?? null, featured_link_type ?? null,
-      is_featured ?? 0, params.id
+      is_featured ?? 0, id
     )
     .run();
 
   const updated = await env.DB.prepare(`SELECT * FROM songs WHERE id = ?`)
-    .bind(params.id).first();
+    .bind(id).first();
   return NextResponse.json(updated);
 }
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest, 
+  context: RouteContext
+) {
+  const { id } = await context.params;
   const { env } = await getCloudflareContext({ async: true });
-  await env.DB.prepare(`DELETE FROM songs WHERE id = ?`).bind(params.id).run();
+  
+  await env.DB.prepare(`DELETE FROM songs WHERE id = ?`).bind(id).run();
+  
   return NextResponse.json({ ok: true });
 }
