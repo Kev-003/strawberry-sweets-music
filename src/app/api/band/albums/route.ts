@@ -1,9 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const runtime = "edge";
 
-export async function GET() {
+// Define the Next.js 15 route context parameter type
+type RouteContext = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+// 1. Updated GET Method with context argument
+export async function GET(
+  request: NextRequest,
+  context: RouteContext
+) {
+  // We don't need to await context.params since it's unused,
+  // but it must be present in the signature to satisfy the constraint.
+  
   const { env } = await getCloudflareContext({ async: true });
   const { results: albums } = await env.DB.prepare(
     `SELECT * FROM albums ORDER BY created_at DESC`
@@ -21,7 +35,11 @@ export async function GET() {
   return NextResponse.json(albumsWithSongs);
 }
 
-export async function POST(request: Request) {
+// 2. Updated POST Method with context argument
+export async function POST(
+  request: NextRequest,
+  context: RouteContext
+) {
   const { env } = await getCloudflareContext({ async: true });
   const body = await request.json();
 
