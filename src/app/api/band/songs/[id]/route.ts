@@ -29,7 +29,7 @@ export async function PUT(
 ) {
   const { id } = await context.params;
   const { env } = await getCloudflareContext({ async: true });
-  const body = await request.json();
+  const body = await request.json() as any;
 
   const {
     title, album_id, cover_art, banner_webp, banner_gif,
