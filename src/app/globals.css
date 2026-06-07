@@ -1,21 +1,29 @@
 @import "tailwindcss";
 
+@plugin 'tailwindcss-animate';
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-*: initial;
+  /* ── Brand Fonts ── */
+  --font-sans:
+    "DM Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
+  --font-brand: "Caveat", ui-sans-serif, system-ui, sans-serif;
   --font-outfit: Outfit, sans-serif;
 
-  --breakpoint-*: initial;
+  /* ── Breakpoints (TailAdmin) ── */
   --breakpoint-2xsm: 375px;
   --breakpoint-xsm: 425px;
-  --breakpoint-3xl: 2000px;
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 2000px;
 
+  /* ── Text Scale (TailAdmin) ── */
   --text-title-2xl: 72px;
   --text-title-2xl--line-height: 90px;
   --text-title-xl: 60px;
@@ -33,36 +41,53 @@
   --text-theme-xs: 12px;
   --text-theme-xs--line-height: 18px;
 
+  /* ── Radii ── */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* ── Semantic Color Tokens (Brand) ── */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-muted: var(--brand-muted);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── TailAdmin Palette ── */
   --color-current: currentColor;
   --color-transparent: transparent;
   --color-white: #ffffff;
   --color-black: #101828;
-
-  --color-brand-25: #f2f7ff;
-  --color-brand-50: #ecf3ff;
-  --color-brand-100: #dde9ff;
-  --color-brand-200: #c2d6ff;
-  --color-brand-300: #9cb9ff;
-  --color-brand-400: #7592ff;
-  --color-brand-500: #465fff;
-  --color-brand-600: #3641f5;
-  --color-brand-700: #2a31d8;
-  --color-brand-800: #252dae;
-  --color-brand-900: #262e89;
-  --color-brand-950: #161950;
-
-  --color-blue-light-25: #f5fbff;
-  --color-blue-light-50: #f0f9ff;
-  --color-blue-light-100: #e0f2fe;
-  --color-blue-light-200: #b9e6fe;
-  --color-blue-light-300: #7cd4fd;
-  --color-blue-light-400: #36bffa;
-  --color-blue-light-500: #0ba5ec;
-  --color-blue-light-600: #0086c9;
-  --color-blue-light-700: #026aa2;
-  --color-blue-light-800: #065986;
-  --color-blue-light-900: #0b4a6f;
-  --color-blue-light-950: #062c41;
 
   --color-gray-25: #fcfcfd;
   --color-gray-50: #f9fafb;
@@ -77,6 +102,19 @@
   --color-gray-900: #101828;
   --color-gray-950: #0c111d;
   --color-gray-dark: #1a2231;
+
+  --color-blue-light-25: #f5fbff;
+  --color-blue-light-50: #f0f9ff;
+  --color-blue-light-100: #e0f2fe;
+  --color-blue-light-200: #b9e6fe;
+  --color-blue-light-300: #7cd4fd;
+  --color-blue-light-400: #36bffa;
+  --color-blue-light-500: #0ba5ec;
+  --color-blue-light-600: #0086c9;
+  --color-blue-light-700: #026aa2;
+  --color-blue-light-800: #065986;
+  --color-blue-light-900: #0b4a6f;
+  --color-blue-light-950: #062c41;
 
   --color-orange-25: #fffaf5;
   --color-orange-50: #fff6ed;
@@ -131,9 +169,9 @@
   --color-warning-950: #4e1d09;
 
   --color-theme-pink-500: #ee46bc;
-
   --color-theme-purple-500: #7a5af8;
 
+  /* ── Shadows (TailAdmin) ── */
   --shadow-theme-md:
     0px 4px 8px -2px rgba(16, 24, 40, 0.1),
     0px 2px 4px -2px rgba(16, 24, 40, 0.06);
@@ -154,10 +192,10 @@
   --shadow-tooltip:
     0px 4px 6px -2px rgba(16, 24, 40, 0.05),
     -8px 0px 20px 8px rgba(16, 24, 40, 0.05);
-
   --drop-shadow-4xl:
     0 35px 35px rgba(0, 0, 0, 0.25), 0 45px 65px rgba(0, 0, 0, 0.15);
 
+  /* ── Z-index Scale (TailAdmin) ── */
   --z-index-1: 1;
   --z-index-9: 9;
   --z-index-99: 99;
@@ -167,14 +205,86 @@
   --z-index-999999: 999999;
 }
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+/* ── Brand CSS Variables ── */
+:root {
+  --background: hsl(0, 20%, 97%);
+  --foreground: hsl(0, 0%, 3.9%);
+  --card: hsl(0, 20%, 97%);
+  --card-foreground: hsl(0, 0%, 3.9%);
+  --popover: hsl(0, 20%, 97%);
+  --popover-foreground: hsl(0, 0%, 3.9%);
+  --primary: hsl(0, 52%, 38%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(0, 15%, 92%);
+  --secondary-foreground: hsl(0, 20%, 15%);
+  --muted: hsl(0, 10%, 94%);
+  --muted-foreground: hsl(0, 8%, 45%);
+  --accent: hsl(0, 20%, 90%);
+  --accent-foreground: hsl(0, 30%, 20%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 10%, 88%);
+  --input: hsl(0, 10%, 85%);
+  --ring: hsl(0, 52%, 38%);
+  --brand: hsl(0, 52%, 38%);
+  --brand-foreground: hsl(0, 0%, 98%);
+  --brand-muted: hsl(0, 30%, 58%);
+  --chart-1: hsl(0, 52%, 45%);
+  --chart-2: hsl(173, 58%, 39%);
+  --chart-3: hsl(197, 37%, 24%);
+  --chart-4: hsl(43, 74%, 66%);
+  --chart-5: hsl(27, 87%, 67%);
+  --radius: 0.5rem;
+  --sidebar-background: hsl(0, 10%, 96%);
+  --sidebar-foreground: hsl(0, 10%, 30%);
+  --sidebar-primary: hsl(0, 52%, 38%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(0, 10%, 91%);
+  --sidebar-accent-foreground: hsl(0, 15%, 25%);
+  --sidebar-border: hsl(0, 10%, 88%);
+  --sidebar-ring: hsl(0, 52%, 38%);
+}
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+.dark {
+  --background: hsl(0, 8%, 8%);
+  --foreground: hsl(0, 0%, 93%);
+  --card: hsl(0, 8%, 10%);
+  --card-foreground: hsl(0, 0%, 93%);
+  --popover: hsl(0, 8%, 10%);
+  --popover-foreground: hsl(0, 0%, 93%);
+  --primary: hsl(0, 52%, 52%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(0, 6%, 15%);
+  --secondary-foreground: hsl(0, 0%, 90%);
+  --muted: hsl(0, 6%, 13%);
+  --muted-foreground: hsl(0, 5%, 60%);
+  --accent: hsl(0, 6%, 16%);
+  --accent-foreground: hsl(0, 0%, 90%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 6%, 16%);
+  --input: hsl(0, 6%, 16%);
+  --ring: hsl(0, 52%, 52%);
+  --brand: hsl(0, 52%, 52%);
+  --brand-foreground: hsl(0, 0%, 98%);
+  --brand-muted: hsl(0, 30%, 35%);
+  --chart-1: hsl(0, 52%, 55%);
+  --chart-2: hsl(160, 60%, 45%);
+  --chart-3: hsl(30, 80%, 55%);
+  --chart-4: hsl(280, 65%, 60%);
+  --chart-5: hsl(340, 75%, 55%);
+  --radius: 0.5rem;
+  --sidebar-background: hsl(0, 8%, 7%);
+  --sidebar-foreground: hsl(0, 0%, 78%);
+  --sidebar-primary: hsl(0, 52%, 52%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(0, 6%, 13%);
+  --sidebar-accent-foreground: hsl(0, 0%, 88%);
+  --sidebar-border: hsl(0, 6%, 14%);
+  --sidebar-ring: hsl(0, 52%, 52%);
+}
+
+/* ── Base Layer ── */
 @layer base {
   *,
   ::after,
@@ -183,93 +293,95 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
+
+  * {
+    @apply border-border;
+  }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
   body {
-    @apply relative font-normal font-outfit z-1 bg-gray-50;
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+  }
+
+  .brand-heading {
+    font-family: var(--font-brand);
+    font-weight: 700;
   }
 }
 
+/* ── TailAdmin Utilities ── */
 @utility menu-item {
   @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-theme-sm;
 }
-
 @utility menu-item-active {
   @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
 }
-
 @utility menu-item-inactive {
   @apply text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300;
 }
-
 @utility menu-item-icon {
   @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400;
 }
-
 @utility menu-item-icon-active {
   @apply text-brand-500 dark:text-brand-400;
 }
-
 @utility menu-item-icon-inactive {
   @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
 }
-
 @utility menu-item-arrow {
   @apply relative;
 }
-
 @utility menu-item-arrow-active {
   @apply rotate-180 text-brand-500 dark:text-brand-400;
 }
-
 @utility menu-item-arrow-inactive {
   @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
 }
-
 @utility menu-dropdown-item {
   @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-theme-sm font-medium;
 }
-
 @utility menu-dropdown-item-active {
   @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
 }
-
 @utility menu-dropdown-item-inactive {
   @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
 }
-
 @utility menu-dropdown-badge {
   @apply block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase text-brand-500 dark:text-brand-400;
 }
-
 @utility menu-dropdown-badge-active {
   @apply bg-brand-100 dark:bg-brand-500/20;
 }
-
 @utility menu-dropdown-badge-inactive {
   @apply bg-brand-50 group-hover:bg-brand-100 dark:bg-brand-500/15 dark:group-hover:bg-brand-500/20;
 }
-
 @utility no-scrollbar {
-  /* Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
   }
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-
 @utility custom-scrollbar {
   &::-webkit-scrollbar {
     @apply size-1.5;
   }
-
   &::-webkit-scrollbar-track {
     @apply rounded-full;
   }
-
   &::-webkit-scrollbar-thumb {
     @apply bg-gray-200 rounded-full dark:bg-gray-700;
   }
@@ -280,7 +392,6 @@
 }
 
 @layer utilities {
-  /* For Remove Date Icon */
   input[type="date"]::-webkit-inner-spin-button,
   input[type="time"]::-webkit-inner-spin-button,
   input[type="date"]::-webkit-calendar-picker-indicator,
@@ -290,19 +401,16 @@
   }
 }
 
-/* third-party libraries CSS */
+/* ── Third-party: ApexCharts ── */
 .apexcharts-legend-text {
   @apply !text-gray-700 dark:!text-gray-400;
 }
-
 .apexcharts-text {
   @apply !fill-gray-700 dark:!fill-gray-400;
 }
-
 .apexcharts-tooltip.apexcharts-theme-light {
   @apply gap-1 !rounded-lg !border-gray-200 p-3 !shadow-theme-sm dark:!border-gray-800 dark:!bg-gray-900;
 }
-
 .apexcharts-legend-text {
   @apply pl-5! !text-gray-700 dark:!text-gray-400;
 }
@@ -321,18 +429,17 @@
 .apexcharts-tooltip-text-y-value {
   @apply !font-medium;
 }
-
 .apexcharts-gridline {
   @apply !stroke-gray-100 dark:!stroke-gray-800;
 }
 
+/* ── Third-party: Flatpickr ── */
 .flatpickr-wrapper {
   @apply w-full;
 }
 .flatpickr-calendar {
   @apply mt-2 !bg-white !rounded-xl !p-5 !border !border-gray-200 dark:!border-gray-800 !text-gray-500 dark:!bg-gray-dark dark:!text-gray-400 dark:!shadow-theme-xl 2xsm:!w-auto;
 }
-
 .flatpickr-months .flatpickr-prev-month:hover svg,
 .flatpickr-months .flatpickr-next-month:hover svg {
   @apply stroke-brand-500;
@@ -341,7 +448,6 @@
 .flatpickr-calendar.arrowTop:after {
   @apply hidden;
 }
-
 .flatpickr-current-month {
   @apply !p-0;
 }
@@ -349,20 +455,16 @@
 .flatpickr-current-month input.cur-year {
   @apply !h-auto !pt-0 !text-lg !font-medium !text-gray-800 dark:!text-white/90;
 }
-
 .flatpickr-prev-month,
 .flatpickr-next-month {
   @apply !p-0;
 }
-
 .flatpickr-weekdays {
   @apply h-auto mt-6 mb-4 !bg-transparent;
 }
-
 .flatpickr-calendar {
   @apply mt-2 !bg-white !rounded-xl !p-5 !shadow-none !border !border-gray-200 dark:!border-white/5 !text-gray-500 dark:!bg-gray-dark dark:!text-gray-400 dark:!shadow-theme-xl 2xsm:!w-auto;
 }
-
 @media (max-width: 525px) {
   .flatpickr-calendar.static {
     left: auto !important;
@@ -370,11 +472,9 @@
     margin-right: -30px;
   }
 }
-
 .flatpickr-weekday {
   @apply !text-theme-sm !font-medium !text-gray-500 dark:!text-gray-400 !bg-transparent;
 }
-
 .flatpickr-day {
   @apply !flex !items-center !text-theme-sm !font-medium !text-gray-800 dark:!text-white/90 dark:hover:!border-gray-300 dark:hover:!bg-gray-900;
 }
@@ -382,7 +482,6 @@
 .flatpickr-day.prevMonthDay {
   @apply !text-gray-400;
 }
-
 .flatpickr-months > .flatpickr-month {
   background: none !important;
 }
@@ -445,7 +544,6 @@ span.flatpickr-weekday,
 }
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
-.flatpickr-day.selected,
 .flatpickr-day.endRange {
   @apply !text-white dark:!text-white;
 }
@@ -475,7 +573,6 @@ span.flatpickr-weekday,
 .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n + 1)) {
   box-shadow: -10px 0 0 #465fff;
 }
-
 .flatpickr-months .flatpickr-prev-month svg,
 .flatpickr-months .flatpickr-next-month svg,
 .flatpickr-months .flatpickr-prev-month,
@@ -486,11 +583,11 @@ span.flatpickr-weekday,
 .flatpickr-months .flatpickr-next-month:hover svg {
   fill: none !important;
 }
-
 .flatpickr-calendar.static {
   @apply right-0;
 }
 
+/* ── Third-party: FullCalendar ── */
 .fc .fc-view-harness {
   @apply max-w-full overflow-x-auto custom-scrollbar;
 }
@@ -513,7 +610,6 @@ span.flatpickr-weekday,
 .fc-button-group .fc-button {
   @apply flex h-10 w-10 items-center justify-center !rounded-lg border border-gray-200 bg-transparent hover:border-gray-200 hover:bg-gray-50 focus:shadow-none active:!border-gray-200 active:!bg-transparent active:!shadow-none dark:border-gray-800 dark:hover:border-gray-800 dark:hover:bg-gray-900 dark:active:border-gray-800!;
 }
-
 .fc-button-group .fc-button.fc-prev-button:before {
   @apply inline-block mt-1;
   content: url("data:image/svg+xml,%3Csvg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16.0068 6L9.75684 12.25L16.0068 18.5' stroke='%23344054' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
@@ -633,6 +729,7 @@ span.flatpickr-weekday,
   @apply min-h-screen;
 }
 
+/* ── Third-party: Misc ── */
 .input-date-icon::-webkit-inner-spin-button,
 .input-date-icon::-webkit-calendar-picker-indicator {
   opacity: 0;
@@ -643,22 +740,18 @@ span.flatpickr-weekday,
 .stocks-slider-outer .swiper-button-prev:after {
   @apply hidden;
 }
-
 .stocks-slider-outer .swiper-button-next,
 .stocks-slider-outer .swiper-button-prev {
-  @apply !static mt-0 h-8 w-9 rounded-full border dark:hover:bg-white/[0.05] border-gray-200 !text-gray-700 transition hover:bg-gray-100 dark:border-white/[0.03] dark:bg-gray-800 dark:!text-gray-400  dark:hover:!text-white/90;
+  @apply !static mt-0 h-8 w-9 rounded-full border dark:hover:bg-white/[0.05] border-gray-200 !text-gray-700 transition hover:bg-gray-100 dark:border-white/[0.03] dark:bg-gray-800 dark:!text-gray-400 dark:hover:!text-white/90;
 }
-
 .stocks-slider-outer .swiper-button-next.swiper-button-disabled,
 .stocks-slider-outer .swiper-button-prev.swiper-button-disabled {
   @apply bg-white opacity-50 dark:bg-gray-900;
 }
-
 .stocks-slider-outer .swiper-button-next svg,
 .stocks-slider-outer .swiper-button-prev svg {
   @apply !h-auto !w-auto;
 }
-
 .swiper-button-prev svg,
 .swiper-button-next svg {
   @apply !h-auto !w-auto;
@@ -682,12 +775,10 @@ span.flatpickr-weekday,
 .carouselFour .swiper-button-prev {
   @apply h-10 w-10 rounded-full border-[0.5px] border-white/10 bg-white/90 !text-gray-700 shadow-slider-navigation backdrop-blur-[10px];
 }
-
 .carouselTwo .swiper-button-prev,
 .carouselFour .swiper-button-prev {
   @apply !left-3 sm:!left-4;
 }
-
 .carouselTwo .swiper-button-next,
 .carouselFour .swiper-button-next {
   @apply !right-3 sm:!right-4;
@@ -697,12 +788,10 @@ span.flatpickr-weekday,
 .carouselFour .swiper-pagination {
   @apply !bottom-3 !left-1/2 inline-flex !w-auto -translate-x-1/2 items-center gap-1.5 rounded-[40px] border-[0.5px] border-white/10 bg-white/60 px-2 py-1.5 shadow-slider-navigation backdrop-blur-[10px] sm:!bottom-5;
 }
-
 .carouselThree .swiper-pagination-bullet,
 .carouselFour .swiper-pagination-bullet {
   @apply !m-0 h-2.5 w-2.5 bg-white opacity-100 shadow-theme-xs duration-200 ease-in-out;
 }
-
 .carouselThree .swiper-pagination-bullet-active,
 .carouselFour .swiper-pagination-bullet-active {
   @apply w-6.5 rounded-xl;
@@ -728,7 +817,6 @@ span.flatpickr-weekday,
 .form-check-input:checked ~ span {
   @apply border-[6px] border-brand-500 bg-brand-500 dark:border-brand-500;
 }
-
 .taskCheckbox:checked ~ .box span {
   @apply opacity-100 bg-brand-500;
 }
@@ -738,16 +826,12 @@ span.flatpickr-weekday,
 .taskCheckbox:checked ~ .box {
   @apply border-brand-500 bg-brand-500 dark:border-brand-500;
 }
-
 .task {
-  transition: all 0.2s ease; /* Smooth transition for visual effects */
-}
-
-.task {
+  transition: all 0.2s ease;
   border-radius: 0.75rem;
   box-shadow:
     0 1px 3px 0 rgba(16, 24, 40, 0.1),
     0 1px 2px 0 rgba(16, 24, 40, 0.06);
   opacity: 0.8;
-  cursor: grabbing; /* Changes the cursor to indicate dragging */
+  cursor: grabbing;
 }

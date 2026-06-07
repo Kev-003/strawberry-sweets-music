@@ -1,52 +1,110 @@
-import Image from "next/image";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import Welcome from "@/components/custom/welcome";
+import type { AlbumFilter, SongItem } from "@/components/custom/song-list";
 
-export default function Home() {
-	return (
-		<div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-			<main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-				<Image className="dark:invert" src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
-				<ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-					<li className="mb-2 tracking-[-.01em]">
-						Get started by editing{" "}
-						<code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-							src/app/page.tsx
-						</code>
-						.
-					</li>
-					<li className="tracking-[-.01em]">Save and see your changes instantly.</li>
-				</ol>
+export const runtime = "edge";
 
-				<div className="flex gap-4 items-center flex-col sm:flex-row">
-					<a
-						className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-						href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Read our docs
-					</a>
-				</div>
-			</main>
-			<footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
-					Learn
-				</a>
-				<a
-					className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-					href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-					Go to nextjs.org →
-				</a>
-			</footer>
-		</div>
-	);
+export const metadata: Metadata = {
+  title: "Strawberry Sweets",
+  description:
+    "Strawberry Sweets is an indie band from Balanga, Bataan. Making songs that capture fleeting feelings and dreamlike moments.",
+  keywords:
+    "Strawberry Sweets, indie band, Balanga, Bataan, Filipino indie, OPM",
+  openGraph: {
+    title: "Strawberry Sweets",
+    description:
+      "Making songs that capture fleeting feelings and dreamlike moments.",
+    type: "website",
+    url: "https://strawberry-sweets-music.cc",
+    images: [{ url: `${process.env.STORAGE_URL}/band.webp` }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Strawberry Sweets",
+    description:
+      "Making songs that capture fleeting feelings and dreamlike moments.",
+    images: [`${process.env.STORAGE_URL}/band.webp`],
+  },
+};
+
+export default async function Page() {
+  const { env } = await getCloudflareContext({ async: true });
+
+  // Songs (with album title joined)
+  const { results: rawSongs } = await env.DB.prepare(
+    `SELECT songs.*, albums.title as album_title
+     FROM songs
+     LEFT JOIN albums ON songs.album_id = albums.id
+     ORDER BY songs.created_at DESC`,
+  ).all();
+
+  const songs: SongItem[] = rawSongs.map((s: any) => ({
+    ...s,
+    links: s.links ? JSON.parse(s.links) : null,
+    album: s.album_title ? { title: s.album_title } : null,
+  }));
+
+  // Albums (for filter list)
+  const { results: rawAlbums } = await env.DB.prepare(
+    `SELECT id, title FROM albums ORDER BY created_at DESC`,
+  ).all();
+
+  const albums: AlbumFilter[] = rawAlbums.map((a: any) => ({
+    id: a.id,
+    title: a.title,
+  }));
+
+  // Featured item
+  const featuredType = await env.DB.prepare(
+    `SELECT value FROM settings WHERE key = 'featured_type'`,
+  ).first<{ value: string }>();
+
+  const featuredId = await env.DB.prepare(
+    `SELECT value FROM settings WHERE key = 'featured_id'`,
+  ).first<{ value: string }>();
+
+  let featuredSong = undefined;
+  let featuredAlbum = undefined;
+
+  if (featuredType && featuredId) {
+    if (featuredType.value === "song") {
+      const raw = await env.DB.prepare(`SELECT * FROM songs WHERE id = ?`)
+        .bind(featuredId.value)
+        .first<any>();
+      if (raw)
+        featuredSong = {
+          ...raw,
+          links: raw.links ? JSON.parse(raw.links) : null,
+        };
+    } else {
+      const raw = await env.DB.prepare(`SELECT * FROM albums WHERE id = ?`)
+        .bind(featuredId.value)
+        .first<any>();
+      if (raw)
+        featuredAlbum = {
+          ...raw,
+          links: raw.links ? JSON.parse(raw.links) : null,
+        };
+    }
+  }
+
+  // Auth — read band_session cookie
+  const cookieStore = await cookies();
+  const session = cookieStore.get("band_session");
+  const isAuthenticated = !!session?.value;
+
+  const storageUrl = process.env.STORAGE_URL ?? "";
+
+  return (
+    <Welcome
+      songs={songs}
+      albums={albums}
+      featuredSong={featuredSong}
+      featuredAlbum={featuredAlbum}
+      storageUrl={storageUrl}
+      isAuthenticated={isAuthenticated}
+    />
+  );
 }
