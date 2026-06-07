@@ -4,7 +4,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 export const runtime = "edge";
 
 export async function POST(request: Request) {
-  const { env } = await getCloudflareContext({ async: true });
+  const { env } = await getCloudflareContext({ async: true }) as { env: any };
   const { email, password } = await request.json() as any;
 
   const validEmails = (env.BAND_EMAILS as string).split(",").map((e: string) => e.trim());
