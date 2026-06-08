@@ -41,9 +41,9 @@ export default function BandDashboard() {
         fetch("/api/band/albums"),
         fetch("/api/band/featured"),
       ]);
-      const songsData = await songsRes.json();
-      const albumsData = await albumsRes.json();
-      const featuredData = await featuredRes.json();
+      const songsData = (await songsRes.json()) as any[];
+      const albumsData = (await albumsRes.json()) as any[];
+      const featuredData = (await featuredRes.json()) as any;
 
       setSongs(songsData);
       setAlbums(albumsData);
