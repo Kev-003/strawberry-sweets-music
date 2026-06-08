@@ -113,7 +113,7 @@ export default function AlbumsPage() {
       });
       // Assign songs to the newly created album
       if (selectedSongIds.length > 0) {
-        const newAlbum = await res.json();
+        const newAlbum = (await res.json()) as any;
         await fetch(`/api/band/albums/${newAlbum.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
