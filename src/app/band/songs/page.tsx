@@ -72,7 +72,7 @@ export default function SongsPage() {
     fd.append("file", file);
     fd.append("folder", folder);
     const res = await fetch("/api/band/upload", { method: "POST", body: fd });
-    const data = await res.json();
+    const data = (await res.json()) as { url: string };
     return data.url;
   }
 
