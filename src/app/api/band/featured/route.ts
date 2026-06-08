@@ -25,7 +25,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
-  const { type, id } = await request.json();
+  const { type, id } = await request.json() as any;
 
   if (!["song", "album"].includes(type)) {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
