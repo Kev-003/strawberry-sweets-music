@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
   "dev": "next dev",
-  "build": "npm run build:cf",
+  "build": "next build",
   "build:cf": "rm -rf .next .open-next && npx @opennextjs/cloudflare build",
   "start": "next start",
   "lint": "next lint",
