@@ -103,7 +103,7 @@ export default function GalleryStrip({ folders }: GalleryStripProps) {
           .then((r) => r.json())
           .catch(() => [] as string[]),
       ),
-    ).then((results) => setRows(results));
+    ).then((results) => setRows(results as string[][]));
   }, [foldersString]);
 
   const directions: Array<"left" | "right"> = ["left", "right", "left"];
