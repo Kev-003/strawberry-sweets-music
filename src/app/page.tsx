@@ -5,6 +5,8 @@ import Welcome from "@/components/custom/welcome";
 import type { AlbumFilter, SongItem } from "@/components/custom/song-list";
 
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Strawberry Sweets",
   description:
@@ -17,14 +19,14 @@ export const metadata: Metadata = {
       "Making songs that capture fleeting feelings and dreamlike moments.",
     type: "website",
     url: "https://strawberry-sweets-music.cc",
-    images: [{ url: `${process.env.STORAGE_URL}/band.webp` }],
+    images: [{ url: "https://pub-19202e96198a4f7ba7bbc7f311350d8a.r2.dev/band.webp" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Strawberry Sweets",
     description:
       "Making songs that capture fleeting feelings and dreamlike moments.",
-    images: [`${process.env.STORAGE_URL}/band.webp`],
+    images: ["https://pub-19202e96198a4f7ba7bbc7f311350d8a.r2.dev/band.webp"],
   },
 };
 
@@ -94,7 +96,7 @@ export default async function Page() {
   const session = cookieStore.get("band_session");
   const isAuthenticated = !!session?.value;
 
-  const storageUrl = process.env.STORAGE_URL ?? "";
+  const storageUrl = (env as any).R2_PUBLIC_URL ?? process.env.STORAGE_URL ?? "";
 
   return (
     <Welcome

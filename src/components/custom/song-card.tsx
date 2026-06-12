@@ -12,6 +12,12 @@ interface SongCardProps {
     storageUrl: string;
 }
 
+function resolveUrl(path: string | null | undefined, base: string): string {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    return `${base}/${path}`;
+}
+
 export default function SongCard({ title, coverArt, albumTitle, releaseDate, trackNumber, links, storageUrl }: SongCardProps) {
     return (
         <div className="group flex flex-col gap-1 rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-black/5 dark:hover:bg-white/5">
@@ -20,7 +26,7 @@ export default function SongCard({ title, coverArt, albumTitle, releaseDate, tra
                 <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-md shadow-sm">
                     {coverArt ? (
                         <img
-                            src={`${storageUrl}/${coverArt}`}
+                            src={resolveUrl(coverArt, storageUrl)}
                             alt={title}
                             loading="lazy"
                             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"

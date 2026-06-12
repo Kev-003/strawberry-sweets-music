@@ -34,6 +34,12 @@ interface FeaturedItem {
   [key: string]: unknown;
 }
 
+function resolveUrl(path: string | null | undefined, base: string): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  return `${base}/${path}`;
+}
+
 function toEmbedUrl(url: string | null | undefined): string | null {
   if (!url) return null;
   const yt = url.match(
@@ -85,8 +91,8 @@ export default function Welcome({
     const titleEffectSvg = featured?.title_effect_webp;
 
     const mediaToPreload = [
-      titleSvg ? `${storageUrl}/${titleSvg}` : null,
-      titleEffectSvg ? `${storageUrl}/${titleEffectSvg}` : null,
+      resolveUrl(titleSvg, storageUrl),
+      resolveUrl(titleEffectSvg, storageUrl),
     ].filter(Boolean) as string[];
 
     const preloadImage = (src: string) =>
@@ -148,7 +154,7 @@ export default function Welcome({
 
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = `${storageUrl}/${infoCover}`;
+    img.src = resolveUrl(infoCover, storageUrl);
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
@@ -190,7 +196,7 @@ export default function Welcome({
           {bannerImage ? (
             <div className="relative h-[33.33vh] w-full overflow-visible">
               <img
-                src={`${storageUrl}/${bannerImage}`}
+                src={resolveUrl(bannerImage, storageUrl)}
                 alt={featured?.title || "Featured Release"}
                 className="h-full w-full object-cover"
               />
@@ -201,7 +207,7 @@ export default function Welcome({
                     <div className="relative flex items-center justify-center">
                       {titleEffectSvg && (
                         <img
-                          src={`${storageUrl}/${titleEffectSvg}`}
+                          src={resolveUrl(titleEffectSvg, storageUrl)}
                           alt="Title Effect"
                           className="title-effect-anim absolute inset-0 h-full w-full scale-100 opacity-80"
                         />
@@ -209,14 +215,14 @@ export default function Welcome({
                       <div className="relative flex flex-col items-center">
                         {titleSvg && (
                           <img
-                            src={`${storageUrl}/${titleSvg}`}
+                            src={resolveUrl(titleSvg, storageUrl)}
                             alt={`${featured?.title} Text Logo`}
                             className="relative z-10 h-auto w-64 lg:w-130"
                           />
                         )}
                         {!titleSvg && titleEffectSvg && (
                           <img
-                            src={`${storageUrl}/${titleEffectSvg}`}
+                            src={resolveUrl(titleEffectSvg, storageUrl)}
                             alt="Title Effect Placeholder"
                             className="invisible h-auto w-64 lg:w-120"
                           />
@@ -297,7 +303,7 @@ export default function Welcome({
                       </div>
                     ) : infoCover ? (
                       <img
-                        src={`${storageUrl}/${infoCover}`}
+                        src={resolveUrl(infoCover, storageUrl)}
                         alt={infoTitle}
                         className="w-full md:w-64 object-cover shrink-0 aspect-square md:aspect-auto"
                       />
