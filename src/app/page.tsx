@@ -4,7 +4,6 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import Welcome from "@/components/custom/welcome";
 import type { AlbumFilter, SongItem } from "@/components/custom/song-list";
 
-export const runtime = "edge";
 
 export const metadata: Metadata = {
   title: "Strawberry Sweets",
