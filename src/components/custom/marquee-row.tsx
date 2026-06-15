@@ -103,7 +103,7 @@ export default function GalleryStrip({
   useEffect(() => {
     Promise.all(
       folders.map((folder) =>
-        fetch(`${storageUrl}/gallery/${folder}`)
+        fetch(`/api/gallery?folder=${folder}`)
           .then((r) => r.json())
           .catch(() => [] as string[]),
       ),
