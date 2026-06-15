@@ -384,7 +384,10 @@ export default function Welcome({
         </div>
 
         <div className="relative mt-3 flex w-full max-w-full items-center justify-center px-4 py-4 md:mt-30 md:py-10 lg:px-8">
-          <GalleryStrip folders={["dhvsu", "prod", "candid"]} />
+          <GalleryStrip
+            storageUrl={storageUrl}
+            folders={["dhvsu", "prod", "candid"]}
+          />
         </div>
 
         {/* ── Band Photo ── */}

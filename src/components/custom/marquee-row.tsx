@@ -89,17 +89,21 @@ function MarqueeRow({ photos, direction, speed = 40 }: MarqueeRowProps) {
 }
 
 interface GalleryStripProps {
+  storageUrl: string;
   folders: string[];
 }
 
-export default function GalleryStrip({ folders }: GalleryStripProps) {
+export default function GalleryStrip({
+  storageUrl,
+  folders,
+}: GalleryStripProps) {
   const [rows, setRows] = useState<string[][]>([[], [], []]);
   const foldersString = JSON.stringify(folders);
 
   useEffect(() => {
     Promise.all(
       folders.map((folder) =>
-        fetch(`/api/gallery/${folder}`)
+        fetch(`${storageUrl}/gallery/${folder}`)
           .then((r) => r.json())
           .catch(() => [] as string[]),
       ),
