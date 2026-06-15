@@ -83,35 +83,83 @@ export default function Welcome({
   storageUrl,
   isAuthenticated,
 }: WelcomeProps) {
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [selectedSong, setSelectedSong] = useState<SongItem | null>(null);
 
+  // 1. Lift gallery state up here
+  const [galleryRows, setGalleryRows] = useState<string[][]>([[], [], []]);
+  const galleryFolders = ["dhvsu", "prod", "candid"];
+
   useEffect(() => {
-    const featured = featuredSong || featuredAlbum;
-    const titleSvg = featured?.title_webp;
-    const titleEffectSvg = featured?.title_effect_webp;
+    let isMounted = true;
 
-    const mediaToPreload = [
-      resolveUrl(titleSvg, storageUrl),
-      resolveUrl(titleEffectSvg, storageUrl),
-    ].filter(Boolean) as string[];
+    async function preloadEverything() {
+      const featured = featuredSong || featuredAlbum;
+      const titleSvg = featured?.title_webp;
+      const titleEffectSvg = featured?.title_effect_webp;
 
-    const preloadImage = (src: string) =>
-      new Promise((resolve) => {
-        const img = new Image();
-        img.onload = resolve;
-        img.onerror = resolve;
-        img.src = src;
-      });
+      // Core banner media
+      const coreMedia = [
+        resolveUrl(titleSvg, storageUrl),
+        resolveUrl(titleEffectSvg, storageUrl),
+      ].filter(Boolean) as string[];
 
-    const minimumDelay = new Promise((resolve) => setTimeout(resolve, 300));
-    const safetyTimeout = new Promise((resolve) => setTimeout(resolve, 3000));
+      let allMediaToPreload = [...coreMedia];
 
-    Promise.race([
-      Promise.all([...mediaToPreload.map(preloadImage), minimumDelay]),
-      safetyTimeout,
-    ]).then(() => {
-      document.getElementById("loading-screen")?.classList.add("hidden");
-    });
+      // 2. Fetch all R2 Gallery image paths inside the block
+      try {
+        const fetchedRows = await Promise.all(
+          galleryFolders.map((folder) =>
+            fetch(`/api/gallery?folder=${folder}`)
+              // Cast the resolved JSON directly to a string array
+              .then((res) =>
+                res.ok ? (res.json() as Promise<string[]>) : ([] as string[]),
+              )
+              .catch(() => [] as string[]),
+          ),
+        );
+
+        if (isMounted) {
+          // TypeScript will now happily accept this because fetchedRows is inferred as string[][]
+          setGalleryRows(fetchedRows);
+        }
+
+        // Flatten all image asset URLs and append to preload queue
+        const galleryUrls = fetchedRows.flat();
+        allMediaToPreload = [...allMediaToPreload, ...galleryUrls];
+      } catch (err) {
+        console.error("Gallery sync failed during preloading:", err);
+      }
+
+      // 3. Preload image generator
+      const preloadImage = (src: string) =>
+        new Promise((resolve) => {
+          const img = new Image();
+          img.onload = resolve;
+          img.onerror = resolve; // Prevents one dead asset from locking the screen forever
+          img.src = src;
+        });
+
+      const minimumDelay = new Promise((resolve) => setTimeout(resolve, 400));
+      const safetyTimeout = new Promise((resolve) => setTimeout(resolve, 5000)); // 5s max cap
+
+      // Wait for everything to be downloaded into browser cache memory
+      await Promise.race([
+        Promise.all([...allMediaToPreload.map(preloadImage), minimumDelay]),
+        safetyTimeout,
+      ]);
+      setIsPageLoading(false);
+
+      if (isMounted) {
+        document.getElementById("loading-screen")?.classList.add("hidden");
+      }
+    }
+
+    preloadEverything();
+
+    return () => {
+      isMounted = false;
+    };
   }, [featuredSong, featuredAlbum, songs, storageUrl]);
 
   const featured = featuredSong || featuredAlbum;
@@ -170,6 +218,19 @@ export default function Welcome({
     img.onerror = () => setAmbientColor("transparent");
   }, [infoCover, storageUrl]);
 
+  if (isPageLoading) {
+    return (
+      <div
+        className={`fixed inset-0 flex items-center justify-center bg-[#fbfbf7] transition-opacity duration-1000 ease-in-out ${
+          isPageLoading ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
+        <div className="animate-pulse">
+          <AppLogo />
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <div className="bg-background text-foreground dark:bg-background flex min-h-screen flex-col items-center">
@@ -384,10 +445,14 @@ export default function Welcome({
         </div>
 
         <div className="relative mt-3 flex w-full max-w-full items-center justify-center px-4 py-4 md:mt-30 md:py-10 lg:px-8">
-          <GalleryStrip
-            storageUrl={storageUrl}
-            folders={["dhvsu", "prod", "candid"]}
-          />
+          <div className="relative mt-3 flex w-full max-w-full items-center justify-center px-4 py-4 md:mt-30 md:py-10 lg:px-8">
+            {/* 4. Pass the prepared rows straight down */}
+            <GalleryStrip
+              storageUrl={storageUrl}
+              folders={galleryFolders}
+              rows={galleryRows}
+            />
+          </div>
         </div>
 
         {/* ── Band Photo ── */}

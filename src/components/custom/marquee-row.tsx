@@ -1,7 +1,7 @@
 "use client";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 
 interface MarqueeRowProps {
   photos: string[];
@@ -88,28 +88,14 @@ function MarqueeRow({ photos, direction, speed = 40 }: MarqueeRowProps) {
   );
 }
 
+// ── Refactored Component Props ──
 interface GalleryStripProps {
   storageUrl: string;
   folders: string[];
+  rows: string[][]; // Receives clean synced row data from Welcome
 }
 
-export default function GalleryStrip({
-  storageUrl,
-  folders,
-}: GalleryStripProps) {
-  const [rows, setRows] = useState<string[][]>([[], [], []]);
-  const foldersString = JSON.stringify(folders);
-
-  useEffect(() => {
-    Promise.all(
-      folders.map((folder) =>
-        fetch(`/api/gallery?folder=${folder}`)
-          .then((r) => r.json())
-          .catch(() => [] as string[]),
-      ),
-    ).then((results) => setRows(results as string[][]));
-  }, [foldersString]);
-
+export default function GalleryStrip({ folders, rows }: GalleryStripProps) {
   const directions: Array<"left" | "right"> = ["left", "right", "left"];
 
   return (
@@ -117,9 +103,9 @@ export default function GalleryStrip({
       {rows.map((photos, i) =>
         photos.length > 0 ? (
           <MarqueeRow
-            key={folders[i]}
+            key={folders[i] || i}
             photos={photos}
-            direction={directions[i]}
+            direction={directions[i] || "left"}
             speed={35 + i * 5}
           />
         ) : null,
