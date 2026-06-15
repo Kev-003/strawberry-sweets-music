@@ -35,8 +35,8 @@ interface FeaturedItem {
 }
 
 function resolveUrl(path: string | null | undefined, base: string): string {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
   return `${base}/${path}`;
 }
 
@@ -374,7 +374,7 @@ export default function Welcome({
         {/* ── About ── */}
         <div className="relative flex w-full max-w-full items-center justify-center px-4 py-4 md:py-10 lg:px-8">
           <AboutPhrase />
-          <p className="text-foreground text-md relative bottom-5 z-10 mx-2 leading-relaxed md:absolute md:mx-70 md:translate-y-1/2 md:text-3xl">
+          <p className="text-foreground font-display text-md relative bottom-5 z-10 mx-2 leading-relaxed md:absolute md:mx-70 md:translate-y-1/2 md:text-3xl">
             Strawberry Sweets is an indie band from Balanga, Bataan, that
             started from a school event where a one-time performance turned into
             real chemistry. What began as a simple collab soon grew into a

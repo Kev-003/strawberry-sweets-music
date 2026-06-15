@@ -1,4 +1,5 @@
 /* 1. CORE IMPORTS AND PLUGINS */
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Syne:wght@400..800&display=swap");
 @import "tailwindcss";
 @plugin 'tailwindcss-animate';
 
@@ -12,7 +13,6 @@
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
   --font-brand: "Caveat", ui-sans-serif, system-ui, sans-serif;
-  --font-outfit: Outfit, sans-serif;
 
   /* ── Breakpoints ── */
   --breakpoint-2xsm: 375px;

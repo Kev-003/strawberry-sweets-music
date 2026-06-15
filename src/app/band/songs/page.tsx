@@ -19,6 +19,7 @@ type Song = {
   spotify_id: string | null;
   presave_link: string | null;
   video_url: string | null;
+  links: string | null;
   is_featured: number;
 };
 
@@ -31,6 +32,9 @@ const emptyForm = {
   spotify_id: "",
   presave_link: "",
   video_url: "",
+  link_spotify: "",
+  link_youtube: "",
+  link_apple_music: "",
 };
 
 export default function SongsPage() {
@@ -78,6 +82,13 @@ export default function SongsPage() {
 
   async function handleSave() {
     setSaving(true);
+
+    const links: Record<string, string> = {};
+    if (form.link_spotify.trim()) links.spotify = form.link_spotify.trim();
+    if (form.link_youtube.trim()) links.youtube = form.link_youtube.trim();
+    if (form.link_apple_music.trim())
+      links.apple_music = form.link_apple_music.trim();
+
     const body: any = {
       title: form.title,
       album_id: form.album_id ? Number(form.album_id) : null,
@@ -87,6 +98,7 @@ export default function SongsPage() {
       spotify_id: form.spotify_id || null,
       presave_link: form.presave_link || null,
       video_url: form.video_url || null,
+      links: Object.keys(links).length > 0 ? links : null,
     };
 
     if (coverFile) body.cover_art = await uploadFile(coverFile, "songs/covers");
@@ -121,6 +133,19 @@ export default function SongsPage() {
   }
 
   function openEdit(song: Song) {
+    let parsedLinks: {
+      spotify?: string;
+      youtube?: string;
+      apple_music?: string;
+    } = {};
+    if (song.links) {
+      try {
+        parsedLinks = JSON.parse(song.links);
+      } catch {
+        parsedLinks = {};
+      }
+    }
+
     setEditId(song.id);
     setForm({
       title: song.title,
@@ -131,6 +156,9 @@ export default function SongsPage() {
       spotify_id: song.spotify_id ?? "",
       presave_link: song.presave_link ?? "",
       video_url: song.video_url ?? "",
+      link_spotify: parsedLinks.spotify ?? "",
+      link_youtube: parsedLinks.youtube ?? "",
+      link_apple_music: parsedLinks.apple_music ?? "",
     });
     setShowForm(true);
   }
@@ -256,6 +284,48 @@ export default function SongsPage() {
                     placeholder="https://youtube.com/..."
                   />
                 </Field>
+              </div>
+
+              {/* Streaming Links */}
+              <div>
+                <p className="text-theme-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Streaming Links
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Field label="Spotify Link">
+                    <input
+                      value={form.link_spotify}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, link_spotify: e.target.value }))
+                      }
+                      className={inputCls}
+                      placeholder="https://open.spotify.com/track/..."
+                    />
+                  </Field>
+                  <Field label="YouTube Link">
+                    <input
+                      value={form.link_youtube}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, link_youtube: e.target.value }))
+                      }
+                      className={inputCls}
+                      placeholder="https://youtu.be/..."
+                    />
+                  </Field>
+                  <Field label="Apple Music Link">
+                    <input
+                      value={form.link_apple_music}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          link_apple_music: e.target.value,
+                        }))
+                      }
+                      className={inputCls}
+                      placeholder="https://music.apple.com/..."
+                    />
+                  </Field>
+                </div>
               </div>
 
               <Field label="Description">

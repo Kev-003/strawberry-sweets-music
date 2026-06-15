@@ -53,7 +53,7 @@ export default function StreamingButton({
         });
       } else {
         gsap.to(arrowRef.current, {
-          x: 0,
+          x: 2,
           opacity: 1,
           duration: 0.2,
           ease: "power2.out",
@@ -75,23 +75,27 @@ export default function StreamingButton({
     { scope: containerRef, dependencies: [hovered] },
   );
 
+  const hasPosition = /\b(absolute|fixed|sticky|static|relative)\b/.test(
+    className ?? "",
+  );
+
   return (
     <button
       ref={containerRef}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`relative overflow-hidden rounded-full border border-white/20 bg-black/30 px-5 py-2.5 backdrop-blur-md hover:bg-transparent ${className ?? ""}`}
+      className={`${hasPosition ? "" : "relative"} inline-flex items-center overflow-hidden rounded-full border border-white/20 bg-black/30 px-5 py-2.5 backdrop-blur-md hover:bg-transparent ${className ?? ""}`}
       {...props}
     >
       <div
         ref={circleRef}
-        className="absolute right-2.5 h-7 w-7 rounded-full bg-pink-400"
+        className="absolute right-2.5 h-7 w-7 rounded-full bg-brand-500"
         style={{ transformOrigin: "center", zIndex: 0 }}
       />
       <div
         ref={iconWrapRef}
-        className="relative z-10 text-white"
+        className="relative z-10 text-white text-lg"
         style={{ opacity: 0, transform: "translateX(-10px)" }}
       >
         <StreamingIconCycler />
