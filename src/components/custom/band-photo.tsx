@@ -14,26 +14,26 @@ const MEMBERS: Member[] = [
     name: "Renz",
     role: "vocals",
     x: 51,
-    y: 50,
+    y: 30,
     darkPhoto: "renz-sleeping.webp",
   },
   {
     name: "Myles",
     role: "guitar",
-    x: 65,
-    y: 53,
+    x: 64,
+    y: 25,
     darkPhoto: "myles-sleeping.webp",
   },
   {
-    name: "Joemarie",
-    role: "guitar",
-    x: 92,
-    y: 56,
-    darkPhoto: "joemarie-sleeping.webp",
+    name: "Seb",
+    role: "keys",
+    x: 20,
+    y: 29,
+    darkPhoto: "seb-sleeping.webp",
   },
-  { name: "Rod", role: "bass", x: 40, y: 53, darkPhoto: "rod-sleeping.webp" },
-  { name: "Ian", role: "keys", x: 27, y: 50, darkPhoto: "ian-sleeping.webp" },
-  { name: "Kevs", role: "drums", x: 10, y: 54, darkPhoto: "kev-sleeping.webp" },
+  { name: "Rod", role: "bass", x: 34, y: 22, darkPhoto: "rod-sleeping.webp" },
+  //{ name: "Ian", role: "keys", x: 27, y: 50, darkPhoto: "ian-sleeping.webp" },
+  { name: "Kevs", role: "drums", x: 79, y: 27, darkPhoto: "kev-sleeping.webp" },
 ];
 
 function useDarkMode() {
@@ -64,8 +64,25 @@ export default function BandIntro({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDark = useDarkMode();
-
   const isMobile = useIsMobile();
+  const [containerSize, setContainerSize] = useState({
+    width: 800,
+    height: 500,
+  });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    setContainerSize({ width: el.offsetWidth, height: el.offsetHeight });
+    const ro = new ResizeObserver(([entry]) => {
+      setContainerSize({
+        width: entry.contentRect.width,
+        height: entry.contentRect.height,
+      });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   return (
     <div className="w-full max-w-full">
@@ -87,7 +104,7 @@ export default function BandIntro({
           style={
             isMobile
               ? undefined
-              : { filter: "grayscale(80%) blur(2px)", willChange: "filter" }
+              : { filter: "grayscale(70%) blur(5px)", willChange: "filter" }
           }
         />
 
@@ -103,6 +120,12 @@ export default function BandIntro({
         {MEMBERS.map((member, i) => {
           const isHovered = hoveredIndex === i;
           const swapPhoto = isDark && !!member.darkPhoto;
+
+          // Single source of truth for the preview offset — reused for both
+          // the base preview image and the hover spotlight overlay so they
+          // always line up instead of jumping relative to each other.
+          const offsetLeft = (member.x / 100) * containerSize.width - 90;
+          const offsetTop = (member.y / 100) * containerSize.height - 90;
 
           return (
             <div
@@ -144,7 +167,7 @@ export default function BandIntro({
                   }}
                 />
 
-                {/* Preview inside square */}
+                {/* Preview inside square — same scale as the full photo */}
                 <div
                   className="absolute inset-0 overflow-hidden rounded-sm"
                   style={{ zIndex: 1 }}
@@ -157,19 +180,18 @@ export default function BandIntro({
                     }
                     alt=""
                     loading="lazy"
-                    className="h-full w-full object-cover transition-all duration-500"
+                    className="absolute h-auto transition-all duration-500"
                     style={{
-                      objectPosition: `${member.x}% ${member.y}%`,
+                      width: `${containerSize.width}px`,
+                      maxWidth: "none", // <-- override Tailwind preflight's img max-width: 100%
+                      left: `-${offsetLeft}px`,
+                      top: `-${offsetTop}px`,
                       filter: isHovered
                         ? "grayscale(0%) blur(0px)"
                         : swapPhoto
                           ? "grayscale(100%) blur(1.5px)"
                           : "grayscale(0%) blur(1px)",
-                      transform: "scale(3)",
-                      transformOrigin: `${member.x}% ${member.y}%`,
-                      left: `-${(member.x / 100) * (containerRef.current?.offsetWidth ?? 800) - 90}px`,
-                      top: `-${(member.y / 100) * (containerRef.current?.offsetHeight ?? 500) - 90}px`,
-                      willChange: "filter, transform",
+                      willChange: "filter",
                     }}
                   />
                 </div>
@@ -188,9 +210,10 @@ export default function BandIntro({
                       className="absolute h-auto object-cover"
                       style={{
                         filter: "grayscale(0%) blur(0px)",
-                        width: containerRef.current?.offsetWidth ?? "100%",
-                        left: `-${(member.x / 100) * (containerRef.current?.offsetWidth ?? 0) - 40}px`,
-                        top: `-${(member.y / 100) * (containerRef.current?.offsetHeight ?? 0) - 40}px`,
+                        width: `${containerSize.width}px`,
+                        maxWidth: "none", // <-- same fix
+                        left: `-${offsetLeft}px`,
+                        top: `-${offsetTop}px`,
                       }}
                     />
                   </div>
