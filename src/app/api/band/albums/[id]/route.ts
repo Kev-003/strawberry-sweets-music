@@ -20,7 +20,10 @@ export async function GET(
   if (!album) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const { results: songs } = await env.DB.prepare(
-    `SELECT * FROM songs WHERE album_id = ? ORDER BY track_number ASC`
+    `SELECT songs.* FROM songs
+     INNER JOIN song_albums sa ON sa.song_id = songs.id
+     WHERE sa.album_id = ?
+     ORDER BY songs.track_number ASC`
   ).bind(id).all();
 
   return NextResponse.json({ ...album, songs });
@@ -56,18 +59,15 @@ export async function PUT(
     )
     .run();
 
+  // Sync song_albums junction table
   if (Array.isArray(song_ids)) {
-    if (song_ids.length > 0) {
+    // Remove all existing associations for this album
+    await env.DB.prepare(`DELETE FROM song_albums WHERE album_id = ?`).bind(id).run();
+    // Re-insert selected songs
+    for (const songId of song_ids) {
       await env.DB.prepare(
-        `UPDATE songs SET album_id = NULL WHERE album_id = ? AND id NOT IN (${song_ids.map(() => "?").join(",")})`
-      ).bind(id, ...song_ids).run();
-      for (const songId of song_ids) {
-        await env.DB.prepare(`UPDATE songs SET album_id = ? WHERE id = ?`)
-          .bind(id, songId).run();
-      }
-    } else {
-      await env.DB.prepare(`UPDATE songs SET album_id = NULL WHERE album_id = ?`)
-        .bind(id).run();
+        `INSERT OR IGNORE INTO song_albums (song_id, album_id) VALUES (?, ?)`
+      ).bind(songId, id).run();
     }
   }
 
@@ -83,8 +83,8 @@ export async function DELETE(
   const { id } = await context.params;
   const { env } = await getCloudflareContext({ async: true });
   
-  await env.DB.prepare(`UPDATE songs SET album_id = NULL WHERE album_id = ?`)
-    .bind(id).run();
+  // Junction table rows will cascade-delete via FK
+  await env.DB.prepare(`DELETE FROM song_albums WHERE album_id = ?`).bind(id).run();
   await env.DB.prepare(`DELETE FROM albums WHERE id = ?`).bind(id).run();
   
   return NextResponse.json({ ok: true });

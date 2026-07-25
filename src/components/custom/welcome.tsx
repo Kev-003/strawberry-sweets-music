@@ -13,6 +13,7 @@ import SongList, {
 import ThemeToggle from "@/components/custom/theme-toggle";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { FaApple, FaSpotify, FaYoutube } from "react-icons/fa";
 
 interface FeaturedItem {
   title: string;
@@ -85,6 +86,8 @@ export default function Welcome({
 }: WelcomeProps) {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [selectedSong, setSelectedSong] = useState<SongItem | null>(null);
+  const [showSelectionModal, setShowSelectionModal] = useState(false);
+  const [activeLinks, setActiveLinks] = useState<{ name: string; url: string; type: string }[]>([]);
 
   // 1. Lift gallery state up here
   const [galleryRows, setGalleryRows] = useState<string[][]>([[], [], []]);
@@ -170,6 +173,34 @@ export default function Welcome({
   const releaseDate = featured?.release_date;
   const isComingSoon = releaseDate ? new Date(releaseDate) > new Date() : false;
   const hasReleaseDate = !!releaseDate;
+
+  const handleFeaturedClick = () => {
+    if (isComingSoon) {
+      const link = featured?.presave_link || (featured ? resolveFeaturedLink(featured) : null);
+      if (link) window.open(link, "_blank");
+      return;
+    }
+
+    const linksObj = featured?.links as Record<string, string> | null;
+    const spotifyUrl = linksObj?.spotify;
+    const youtubeUrl = linksObj?.youtube;
+    const appleMusicUrl = linksObj?.apple_music;
+
+    const linksList: { name: string; url: string; type: string }[] = [];
+    if (spotifyUrl) linksList.push({ name: "Spotify", url: spotifyUrl, type: "spotify" });
+    if (youtubeUrl) linksList.push({ name: "YouTube", url: youtubeUrl, type: "youtube" });
+    if (appleMusicUrl) linksList.push({ name: "Apple Music", url: appleMusicUrl, type: "apple_music" });
+
+    if (linksList.length === 1) {
+      window.open(linksList[0].url, "_blank");
+    } else if (linksList.length > 1) {
+      setActiveLinks(linksList);
+      setShowSelectionModal(true);
+    } else {
+      const link = featured ? resolveFeaturedLink(featured) : null;
+      if (link) window.open(link, "_blank");
+    }
+  };
 
   const infoTitle = selectedSong
     ? (selectedSong.title ?? null)
@@ -298,12 +329,7 @@ export default function Welcome({
                 <StreamingButton
                   label={isComingSoon ? "Coming Soon" : "Out Now"}
                   className="absolute top-1/2 left-1/2 z-20 mt-6 -translate-x-1/2 translate-y-1/2 rounded-full border border-white/20 bg-black/30 px-4 py-1 text-[10px] font-bold tracking-[0.4em] whitespace-nowrap text-white uppercase shadow-2xl backdrop-blur-md"
-                  onClick={() => {
-                    const link = featured
-                      ? resolveFeaturedLink(featured)
-                      : null;
-                    if (link) window.open(link, "_blank");
-                  }}
+                  onClick={handleFeaturedClick}
                 />
               )}
             </div>
@@ -465,6 +491,90 @@ export default function Welcome({
           <Footer />
         </div>
       </div>
+
+      {showSelectionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            onClick={() => setShowSelectionModal(false)}
+          />
+
+          {/* Modal Content */}
+          <div className="relative w-full max-w-xs overflow-hidden rounded-3xl border border-white/10 bg-white/80 dark:bg-[#121212]/80 p-6 text-center shadow-2xl backdrop-blur-xl transition-all duration-300 scale-100">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowSelectionModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Album/Song cover if any */}
+            {infoCover && (
+              <img
+                src={resolveUrl(infoCover, storageUrl)}
+                alt={infoTitle || ""}
+                className="mx-auto mb-4 h-24 w-24 rounded-2xl object-cover shadow-lg border border-white/10"
+              />
+            )}
+
+            <h3 className="font-display text-base font-bold text-gray-900 dark:text-white truncate px-2">
+              {infoTitle}
+            </h3>
+
+            <p className="mt-2 text-[9px] font-bold tracking-[0.3em] text-brand-500 uppercase mb-5">
+              Listen / Watch
+            </p>
+
+            <div className="flex flex-col gap-2.5">
+              {activeLinks.map((link) => {
+                let icon = null;
+                let colorClass = "";
+                let hoverColorClass = "";
+
+                if (link.type === "spotify") {
+                  icon = <FaSpotify className="text-lg" />;
+                  colorClass = "text-[#1DB954]";
+                  hoverColorClass = "hover:bg-[#1DB954]/10 hover:border-[#1DB954]/30";
+                } else if (link.type === "youtube") {
+                  icon = <FaYoutube className="text-lg" />;
+                  colorClass = "text-[#FF0000]";
+                  hoverColorClass = "hover:bg-[#FF0000]/10 hover:border-[#FF0000]/30";
+                } else if (link.type === "apple_music") {
+                  icon = <FaApple className="text-lg" />;
+                  colorClass = "text-[#FB2441]";
+                  hoverColorClass = "hover:bg-[#FB2441]/10 hover:border-[#FB2441]/30";
+                }
+
+                return (
+                  <a
+                    key={link.type}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setShowSelectionModal(false)}
+                    className={`flex items-center justify-between px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 transition-all duration-200 ${hoverColorClass}`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className={colorClass}>{icon}</span>
+                      <span className="font-display font-semibold text-xs text-gray-800 dark:text-gray-200">
+                        {link.name}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-bold tracking-widest text-gray-400 uppercase">
+                      {link.type === "youtube" ? "Watch" : "Listen"}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

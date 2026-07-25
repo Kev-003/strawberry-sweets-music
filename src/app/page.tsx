@@ -33,18 +33,24 @@ export const metadata: Metadata = {
 export default async function Page() {
   const { env } = await getCloudflareContext({ async: true });
 
-  // Songs (with album title joined)
+  // Songs (with album id + title via junction table)
   const { results: rawSongs } = await env.DB.prepare(
-    `SELECT songs.*, albums.title as album_title
+    `SELECT songs.*,
+            sa.album_id AS joined_album_id,
+            albums.title AS album_title
      FROM songs
-     LEFT JOIN albums ON songs.album_id = albums.id
+     LEFT JOIN song_albums sa ON sa.song_id = songs.id
+     LEFT JOIN albums ON albums.id = sa.album_id
+     GROUP BY songs.id
      ORDER BY songs.created_at DESC`,
   ).all();
 
   const songs: SongItem[] = rawSongs.map((s: any) => ({
     ...s,
     links: s.links ? JSON.parse(s.links) : null,
-    album: s.album_title ? { title: s.album_title } : null,
+    album: s.album_title
+      ? { id: s.joined_album_id, title: s.album_title }
+      : null,
   }));
 
   // Albums (for filter list)

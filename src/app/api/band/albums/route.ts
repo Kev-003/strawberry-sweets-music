@@ -11,7 +11,10 @@ export async function GET() {
   const albumsWithSongs = await Promise.all(
     albums.map(async (album: any) => {
       const { results: songs } = await env.DB.prepare(
-        `SELECT * FROM songs WHERE album_id = ? ORDER BY track_number ASC`
+        `SELECT songs.* FROM songs
+         INNER JOIN song_albums sa ON sa.song_id = songs.id
+         WHERE sa.album_id = ?
+         ORDER BY songs.track_number ASC`
       ).bind(album.id).all();
       return { ...album, songs };
     })
@@ -20,7 +23,7 @@ export async function GET() {
   return NextResponse.json(albumsWithSongs);
 }
 
-// albums/route.ts — POST fixed
+// albums/route.ts — POST
 export async function POST(request: Request) {
   try {
     const { env } = await getCloudflareContext({ async: true });
@@ -36,6 +39,7 @@ export async function POST(request: Request) {
       title, release_date, cover_art, banner_webp, banner_gif,
       title_webp, title_effect_webp, spotify_id, description,
       presave_link, links, featured_link_type, is_featured,
+      song_ids,
     } = body;
 
     if (!title) {
@@ -56,7 +60,16 @@ export async function POST(request: Request) {
         presave_link ?? null, links ? JSON.stringify(links) : null, featured_link_type ?? null,
         is_featured ?? 0
       )
-      .first();
+      .first() as any;
+
+    // Assign songs via junction table if provided
+    if (result && Array.isArray(song_ids) && song_ids.length > 0) {
+      for (const songId of song_ids) {
+        await env.DB.prepare(
+          `INSERT OR IGNORE INTO song_albums (song_id, album_id) VALUES (?, ?)`
+        ).bind(songId, result.id).run();
+      }
+    }
 
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {

@@ -10,6 +10,7 @@ type Song = {
   id: number;
   title: string;
   album_id: number | null;
+  album_ids: number[];
   cover_art: string | null;
   banner_webp: string | null;
   banner_gif: string | null;
@@ -25,7 +26,6 @@ type Song = {
 
 const emptyForm = {
   title: "",
-  album_id: "",
   track_number: "",
   release_date: "",
   description: "",
@@ -45,6 +45,7 @@ export default function SongsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
+  const [selectedAlbumIds, setSelectedAlbumIds] = useState<number[]>([]);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [bannerWebpFile, setBannerWebpFile] = useState<File | null>(null);
   const [bannerGifFile, setBannerGifFile] = useState<File | null>(null);
@@ -91,7 +92,7 @@ export default function SongsPage() {
 
     const body: any = {
       title: form.title,
-      album_id: form.album_id ? Number(form.album_id) : null,
+      album_ids: selectedAlbumIds,
       track_number: form.track_number ? Number(form.track_number) : null,
       release_date: form.release_date || null,
       description: form.description || null,
@@ -147,9 +148,9 @@ export default function SongsPage() {
     }
 
     setEditId(song.id);
+    setSelectedAlbumIds(song.album_ids ?? (song.album_id ? [song.album_id] : []));
     setForm({
       title: song.title,
-      album_id: song.album_id ? String(song.album_id) : "",
       track_number: song.track_number ? String(song.track_number) : "",
       release_date: song.release_date ?? "",
       description: song.description ?? "",
@@ -167,9 +168,16 @@ export default function SongsPage() {
     setForm({ ...emptyForm });
     setEditId(null);
     setShowForm(false);
+    setSelectedAlbumIds([]);
     setCoverFile(null);
     setBannerWebpFile(null);
     setBannerGifFile(null);
+  }
+
+  function toggleAlbum(id: number) {
+    setSelectedAlbumIds((prev) =>
+      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
+    );
   }
 
   const albumMap = Object.fromEntries(albums.map((a: any) => [a.id, a.title]));
@@ -216,22 +224,6 @@ export default function SongsPage() {
                     className={inputCls}
                     placeholder="Song title"
                   />
-                </Field>
-                <Field label="Album">
-                  <select
-                    value={form.album_id}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, album_id: e.target.value }))
-                    }
-                    className={inputCls}
-                  >
-                    <option value="">No album</option>
-                    {albums.map((a: any) => (
-                      <option key={a.id} value={a.id}>
-                        {a.title}
-                      </option>
-                    ))}
-                  </select>
                 </Field>
                 <Field label="Track Number">
                   <input
@@ -284,6 +276,40 @@ export default function SongsPage() {
                     placeholder="https://youtube.com/..."
                   />
                 </Field>
+              </div>
+
+              {/* Album Assignment */}
+              <div>
+                <label className="block text-theme-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Albums
+                </label>
+                <div className="rounded-xl border border-gray-200 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800 max-h-48 overflow-y-auto">
+                  {albums.length === 0 ? (
+                    <p className="px-4 py-3 text-theme-sm text-gray-400">
+                      No albums available.
+                    </p>
+                  ) : (
+                    albums.map((album: any) => (
+                      <label
+                        key={album.id}
+                        className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedAlbumIds.includes(album.id)}
+                          onChange={() => toggleAlbum(album.id)}
+                          className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                        />
+                        <span className="text-theme-sm text-gray-900 dark:text-white">
+                          {album.title}
+                        </span>
+                      </label>
+                    ))
+                  )}
+                </div>
+                <p className="mt-1.5 text-theme-xs text-gray-400">
+                  {selectedAlbumIds.length} album{selectedAlbumIds.length !== 1 ? "s" : ""} selected
+                </p>
               </div>
 
               {/* Streaming Links */}
@@ -440,7 +466,9 @@ export default function SongsPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">
-                        {song.album_id ? (albumMap[song.album_id] ?? "—") : "—"}
+                        {song.album_ids && song.album_ids.length > 0
+                          ? song.album_ids.map((aid: number) => albumMap[aid]).filter(Boolean).join(", ")
+                          : song.album_id ? (albumMap[song.album_id] ?? "—") : "—"}
                       </td>
                       <td className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
                         {song.release_date ?? "—"}

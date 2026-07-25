@@ -12,6 +12,7 @@ type Song = {
   track_number: number | null;
   cover_art: string | null;
   album_id: number | null;
+  album_ids?: number[];
 };
 
 type Album = {
@@ -24,6 +25,7 @@ type Album = {
   description: string | null;
   spotify_id: string | null;
   presave_link: string | null;
+  links: string | null;
   is_featured: number;
   songs: Song[];
 };
@@ -34,6 +36,9 @@ const emptyForm = {
   description: "",
   spotify_id: "",
   presave_link: "",
+  link_spotify: "",
+  link_youtube: "",
+  link_apple_music: "",
 };
 
 export default function AlbumsPage() {
@@ -83,12 +88,18 @@ export default function AlbumsPage() {
 
   async function handleSave() {
     setSaving(true);
+    const links: Record<string, string> = {};
+    if (form.link_spotify.trim()) links.spotify = form.link_spotify.trim();
+    if (form.link_youtube.trim()) links.youtube = form.link_youtube.trim();
+    if (form.link_apple_music.trim()) links.apple_music = form.link_apple_music.trim();
+
     const body: any = {
       title: form.title,
       release_date: form.release_date || null,
       description: form.description || null,
       spotify_id: form.spotify_id || null,
       presave_link: form.presave_link || null,
+      links: Object.keys(links).length > 0 ? links : null,
       song_ids: selectedSongIds,
     };
 
@@ -106,20 +117,11 @@ export default function AlbumsPage() {
         body: JSON.stringify(body),
       });
     } else {
-      const res = await fetch("/api/band/albums", {
+      await fetch("/api/band/albums", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      // Assign songs to the newly created album
-      if (selectedSongIds.length > 0) {
-        const newAlbum = (await res.json()) as any;
-        await fetch(`/api/band/albums/${newAlbum.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...body, song_ids: selectedSongIds }),
-        });
-      }
     }
 
     await load();
@@ -134,6 +136,19 @@ export default function AlbumsPage() {
   }
 
   function openEdit(album: Album) {
+    let parsedLinks: {
+      spotify?: string;
+      youtube?: string;
+      apple_music?: string;
+    } = {};
+    if (album.links) {
+      try {
+        parsedLinks = JSON.parse(album.links);
+      } catch {
+        parsedLinks = {};
+      }
+    }
+
     setEditId(album.id);
     setForm({
       title: album.title,
@@ -141,6 +156,9 @@ export default function AlbumsPage() {
       description: album.description ?? "",
       spotify_id: album.spotify_id ?? "",
       presave_link: album.presave_link ?? "",
+      link_spotify: parsedLinks.spotify ?? "",
+      link_youtube: parsedLinks.youtube ?? "",
+      link_apple_music: parsedLinks.apple_music ?? "",
     });
     setSelectedSongIds(album.songs.map((s) => s.id));
     setShowForm(true);
@@ -237,6 +255,48 @@ export default function AlbumsPage() {
                 </Field>
               </div>
 
+              {/* Streaming Links */}
+              <div>
+                <p className="text-theme-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Streaming Links
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <Field label="Spotify Link">
+                    <input
+                      value={form.link_spotify}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, link_spotify: e.target.value }))
+                      }
+                      className={inputCls}
+                      placeholder="https://open.spotify.com/album/..."
+                    />
+                  </Field>
+                  <Field label="YouTube Link">
+                    <input
+                      value={form.link_youtube}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, link_youtube: e.target.value }))
+                      }
+                      className={inputCls}
+                      placeholder="https://youtu.be/..."
+                    />
+                  </Field>
+                  <Field label="Apple Music Link">
+                    <input
+                      value={form.link_apple_music}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          link_apple_music: e.target.value,
+                        }))
+                      }
+                      className={inputCls}
+                      placeholder="https://music.apple.com/..."
+                    />
+                  </Field>
+                </div>
+              </div>
+
               <Field label="Description">
                 <textarea
                   value={form.description}
@@ -303,11 +363,6 @@ export default function AlbumsPage() {
                             {song.title}
                           </span>
                         </div>
-                        {song.album_id && song.album_id !== editId && (
-                          <span className="text-theme-xs text-gray-400 flex-shrink-0">
-                            In another album
-                          </span>
-                        )}
                       </label>
                     ))
                   )}
