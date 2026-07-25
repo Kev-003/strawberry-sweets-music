@@ -46,7 +46,9 @@ export default function SongList({
   const filtered =
     activeAlbumId == null
       ? songs
-      : songs.filter((s) => s.album?.id === activeAlbumId);
+      : songs
+          .filter((s) => s.album?.id === activeAlbumId)
+          .sort((a, b) => (a.track_number ?? 0) - (b.track_number ?? 0));
 
   return (
     <div className="flex flex-col gap-3">
@@ -81,8 +83,8 @@ export default function SongList({
         </div>
       )}
 
-      {/* Song rows */}
-      <div className="flex flex-col">
+      {/* Song rows — capped height, scrolls past ~3.5 rows */}
+      <div className="flex flex-col max-h-[260px] overflow-y-auto pr-1">
         {filtered.length === 0 ? (
           <p className="text-muted-foreground px-3 py-6 text-center text-sm">
             No songs found.
